@@ -18,3 +18,8 @@ baseline/predict_transfer.py
 # macOS
 .DS_Store
 ._*
+data/
+*.pth
+*.pt
+*.ckpt
+.tmp/
