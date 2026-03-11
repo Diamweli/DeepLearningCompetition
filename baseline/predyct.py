@@ -69,13 +69,23 @@ def mask_labels_in_dir(test_dir):
 
 
 def main():
-    # Chemin vers le dossier test (fourni par l'utilisateur)
-    #Path of the test folder
-    test_dir = '../data/test'   # à adapter
+    # Debug: show current working directory
+    print("Current working directory:", os.getcwd())
+
+    # Path of the test folder (update this if needed)
+    # Option 1: relative path
+    #test_dir = os.path.abspath(os.path.join("..", "data", "test"))
+    # Option 2: absolute path (uncomment and edit if needed)
+    test_dir = r"C:\Users\AIMS\Documents\competion1\data\test"
+
+    if not os.path.exists(test_dir):
+        print(f"Erreur : le dossier de test n'existe pas -> {test_dir}")
+        return
+
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
     model = SimpleCNN()
-    model.load_state_dict(torch.load('baseline_model.pth', map_location=device))
+    model.load_state_dict(torch.load('best_model.pth', map_location=device))
     model.to(device)
     model.eval()
 
@@ -84,15 +94,15 @@ def main():
         transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
     ])
 
-    # On suppose que les images de test sont nommées 0.png, 1.png, ... dans l'ordre
-    # ou selon un fichier list.txt
     masked = mask_labels_in_dir(test_dir)
     if masked:
         print(f"Labels masqués: {len(masked)} fichier(s)")
+
     images = list_image_files(test_dir)
     if not images:
         print("Erreur : aucune image trouvée")
         return
+
     preds = []
     for img_name in images:
         img_path = os.path.join(test_dir, img_name)
@@ -103,10 +113,9 @@ def main():
             pred = output.argmax(dim=1).item()
         preds.append(pred)
 
-    # Sauvegarder les prédictions dans un fichier texte (une classe par ligne)
-    # Save the predictionss in a text file
     np.savetxt('predictions.txt', np.array(preds), fmt='%d')
     print('Prédictions sauvegardées dans predictions.txt')
+
 
 if __name__ == '__main__':
     main()
