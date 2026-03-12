@@ -5,6 +5,8 @@ on:
     paths:
       - 'submissions/*.enc'
       - 'submissions/**/*.enc'
+      - 'submissions/*.txt'
+      - 'submissions/**/*.txt'
 
 jobs:
   evaluate:
@@ -32,19 +34,35 @@ jobs:
         run: |
           echo "$TEST_LABELS_B64" | base64 --decode > evaluation/test_labels.npy
 
-      - name: Récupérer le nom du fichier de soumission
+      - name: Récupérer le fichier de soumission
         id: submission
         run: |
           git fetch origin ${{ github.base_ref }}
+          # Chercher d'abord un .enc, sinon un .txt
           FILE=$(git diff --name-only --diff-filter=A origin/${{ github.base_ref }}...HEAD | grep '^submissions/.*\.enc$' | head -n1)
+          if [ -z "$FILE" ]; then
+            FILE=$(git diff --name-only --diff-filter=A origin/${{ github.base_ref }}...HEAD | grep '^submissions/.*\.txt$' | head -n1)
+          fi
           echo "file=$FILE" >> $GITHUB_OUTPUT
+          # Déterminer le type de fichier
+          if [[ "$FILE" == *.enc ]]; then
+            echo "type=enc" >> $GITHUB_OUTPUT
+          elif [[ "$FILE" == *.txt ]]; then
+            echo "type=txt" >> $GITHUB_OUTPUT
+          else
+            echo "type=unknown" >> $GITHUB_OUTPUT
+          fi
 
-      - name: Déchiffrer la soumission
-        if: steps.submission.outputs.file != ''
+      - name: Déchiffrer la soumission (.enc)
+        if: steps.submission.outputs.file != '' && steps.submission.outputs.type == 'enc'
         continue-on-error: true
         env:
           PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
         run: python encryption/decrypt.py --input "${{ steps.submission.outputs.file }}" --output /tmp/predictions.txt
+
+      - name: Copier la soumission (.txt)
+        if: steps.submission.outputs.file != '' && steps.submission.outputs.type == 'txt'
+        run: cp "${{ steps.submission.outputs.file }}" /tmp/predictions.txt
 
       - name: Exécuter le scoring
         if: steps.submission.outputs.file != ''
