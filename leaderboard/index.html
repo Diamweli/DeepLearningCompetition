@@ -23,7 +23,7 @@
 
     <section class="controls">
       <div id="error-message"
-        style="display: none; color: white; background: #e74c3c; padding: 10px; border-radius: 4px; margin-bottom: 20px; text-align: center; width: 100%;">
+        style="display: none; color: white; background: #e74c3c; padding: 10px; border-radius: 4px; margin-bottom: 20px; text-align: center; width: 100%; grid-column: 1 / -1;">
       </div>
       <div class="search">
         <input id="search-input" type="search" placeholder="Rechercher une équipe" />
@@ -40,6 +40,56 @@
         <button id="refresh-button" type="button">Rafraîchir</button>
       </div>
     </section>
+
+    <!-- Bouton d'upload -->
+    <section class="upload-section">
+      <button id="upload-toggle" type="button" class="upload-btn">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+          <polyline points="17 8 12 3 7 8" />
+          <line x1="12" y1="3" x2="12" y2="15" />
+        </svg>
+        Soumettre des prédictions
+      </button>
+    </section>
+
+    <!-- Modal d'upload -->
+    <div id="upload-modal" class="modal-overlay" style="display: none;">
+      <div class="modal">
+        <div class="modal-header">
+          <h2>Soumettre des prédictions</h2>
+          <button id="modal-close" type="button" class="modal-close">&times;</button>
+        </div>
+        <form id="upload-form">
+          <div class="form-group">
+            <label for="team-name">Nom de l'équipe</label>
+            <input id="team-name" type="text" placeholder="Ex: MonEquipe" required />
+          </div>
+          <div class="form-group">
+            <label for="predictions-file">Fichier de prédictions (.txt)</label>
+            <div id="drop-zone" class="drop-zone">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="17 8 12 3 7 8" />
+                <line x1="12" y1="3" x2="12" y2="15" />
+              </svg>
+              <p>Glissez votre fichier ici ou <strong>cliquez pour sélectionner</strong></p>
+              <p class="drop-hint">Format: un entier (0-9) par ligne</p>
+              <input id="predictions-file" type="file" accept=".txt,.csv,.npy" style="display: none;" />
+            </div>
+            <div id="file-info" class="file-info" style="display: none;">
+              <span id="file-name"></span>
+              <button id="file-remove" type="button" class="file-remove">&times;</button>
+            </div>
+          </div>
+          <div id="upload-status" class="upload-status" style="display: none;"></div>
+          <button id="submit-btn" type="submit" class="submit-btn" disabled>
+            <span id="submit-text">Évaluer et soumettre</span>
+            <span id="submit-spinner" class="spinner" style="display: none;"></span>
+          </button>
+        </form>
+      </div>
+    </div>
 
     <section class="table-wrapper">
       <table class="leaderboard" aria-label="Leaderboard">
