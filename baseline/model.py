@@ -4,28 +4,45 @@ import torch.nn.functional as F
 class SimpleCNN(nn.Module):
     def __init__(self):
         super().__init__()
-        # First convolutional layer: 3 input channels (RGB), 32 output channels, 3x3 kernel
-        self.conv1 = nn.Conv2d(3, 32, 3, padding=1)
-        # Second convolutional layer: 32 input channels, 64 output channels, 3x3 kernel 
-        self.conv2 = nn.Conv2d(32, 64, 3, padding=1)
-        # Max pooling layer: 2x2 kernel
-        self.pool = nn.MaxPool2d(2, 2)
-        # First fully connected layer: 64*8*8 input features, 128 output features
-        self.fc1 = nn.Linear(64 * 8 * 8, 128)
-        self.dropout = nn.Dropout(0.5) #Dropout
-        # Second fully connected layer: 128 input features, 10 output features (for 10 classes)
-        self.fc2 = nn.Linear(128, 10)
+        # Block 1 — 64 filtres
+        self.conv1 = nn.Conv2d(3, 64, 3, padding=1)
+        self.bn1   = nn.BatchNorm2d(64)
+        self.conv2 = nn.Conv2d(64, 64, 3, padding=1)
+        self.bn2   = nn.BatchNorm2d(64)
+        self.pool1 = nn.MaxPool2d(2, 2)           # 32x32 → 16x16
+
+        # Block 2 — 128 filtres
+        self.conv3 = nn.Conv2d(64, 128, 3, padding=1)
+        self.bn3   = nn.BatchNorm2d(128)
+        self.conv4 = nn.Conv2d(128, 128, 3, padding=1)
+        self.bn4   = nn.BatchNorm2d(128)
+        self.pool2 = nn.MaxPool2d(2, 2)           # 16x16 → 8x8
+
+        # Block 3 — 256 filtres
+        self.conv5 = nn.Conv2d(128, 256, 3, padding=1)
+        self.bn5   = nn.BatchNorm2d(256)
+        self.conv6 = nn.Conv2d(256, 256, 3, padding=1)
+        self.bn6   = nn.BatchNorm2d(256)
+        self.pool3 = nn.MaxPool2d(2, 2)           # 8x8 → 4x4
+
+        self.dropout = nn.Dropout(0.5)
+        self.fc1     = nn.Linear(256 * 4 * 4, 512)
+        self.bn_fc   = nn.BatchNorm1d(512)
+        self.fc2     = nn.Linear(512, 10)
 
     def forward(self, x):
-        # Apply first convolutional layer followed by ReLU activation and max pooling
-        x = self.pool(F.relu(self.conv1(x)))
-        # Apply second convolutional layer followed by ReLU activation and max pooling
-        x = self.pool(F.relu(self.conv2(x)))
-        # Flatten the tensor for the fully connected layer
-        x = x.view(-1, 64 * 8 * 8)
-        # Apply first fully connected layer followed by ReLU activation
-        x = F.relu(self.fc1(x))
+        x = F.relu(self.bn1(self.conv1(x)))
+        x = self.pool1(F.relu(self.bn2(self.conv2(x))))
+
+        x = F.relu(self.bn3(self.conv3(x)))
+        x = self.pool2(F.relu(self.bn4(self.conv4(x))))
+
+        x = F.relu(self.bn5(self.conv5(x)))
+        x = self.pool3(F.relu(self.bn6(self.conv6(x))))
+
+        x = x.view(-1, 256 * 4 * 4)
         x = self.dropout(x)
-        # Apply second fully connected layer to get the output logits
+        x = F.relu(self.bn_fc(self.fc1(x)))
+        x = self.dropout(x)
         x = self.fc2(x)
         return x
