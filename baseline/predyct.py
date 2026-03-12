@@ -74,7 +74,7 @@ def main():
 
     # Path of the test folder (update this if needed)
     # Option 1: relative path
-    #test_dir = os.path.abspath(os.path.join("..", "data", "test"))
+    # test_dir = os.path.abspath(os.path.join("..", "data", "test"))
     # Option 2: absolute path (uncomment and edit if needed)
     test_dir = r"C:\Users\AIMS\Documents\competion1\data\test"
 
