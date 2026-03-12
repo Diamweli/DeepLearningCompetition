@@ -1,57 +1,63 @@
 <!DOCTYPE html>
 <html lang="fr">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Leaderboard</title>
-    <link rel="stylesheet" href="styles.css" />
-  </head>
-  <body>
-    <div class="page">
-      <header class="header">
-        <div class="title">
-          <h1>Leaderboard</h1>
-          <p>Classement mis à jour automatiquement</p>
-        </div>
-        <div class="meta">
-          <span id="last-updated">Dernière mise à jour: --</span>
-          <span id="row-count">Participants: 0</span>
-        </div>
-      </header>
 
-      <section class="controls">
-        <div class="search">
-          <input id="search-input" type="search" placeholder="Rechercher une équipe" />
-        </div>
-        <div class="filters">
-          <select id="period-filter">
-            <option value="all">Toutes les périodes</option>
-            <option value="24h">Dernières 24h</option>
-            <option value="7d">7 derniers jours</option>
-            <option value="30d">30 derniers jours</option>
-          </select>
-        </div>
-        <div class="refresh">
-          <button id="refresh-button" type="button">Rafraîchir</button>
-        </div>
-      </section>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Leaderboard</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
 
-      <section class="table-wrapper">
-        <table class="leaderboard" aria-label="Leaderboard">
-          <thead>
-            <tr>
-              <th data-key="rank">Rang</th>
-              <th data-key="team">Équipe</th>
-              <th data-key="accuracy">Score</th>
-              <th data-key="submitted_at">Temps</th>
-              <th data-key="progress">Progression</th>
-            </tr>
-          </thead>
-          <tbody id="leaderboard-body"></tbody>
-        </table>
-      </section>
-    </div>
+<body>
+  <div class="page">
+    <header class="header">
+      <div class="title">
+        <h1>Leaderboard</h1>
+        <p>Classement mis à jour automatiquement</p>
+      </div>
+      <div class="meta">
+        <span id="last-updated">Dernière mise à jour: --</span>
+        <span id="row-count">Participants: 0</span>
+      </div>
+    </header>
 
-    <script src="app.js"></script>
-  </body>
+    <section class="controls">
+      <div id="error-message"
+        style="display: none; color: white; background: #e74c3c; padding: 10px; border-radius: 4px; margin-bottom: 20px; text-align: center; width: 100%;">
+      </div>
+      <div class="search">
+        <input id="search-input" type="search" placeholder="Rechercher une équipe" />
+      </div>
+      <div class="filters">
+        <select id="period-filter">
+          <option value="all">Toutes les périodes</option>
+          <option value="24h">Dernières 24h</option>
+          <option value="7d">7 derniers jours</option>
+          <option value="30d">30 derniers jours</option>
+        </select>
+      </div>
+      <div class="refresh">
+        <button id="refresh-button" type="button">Rafraîchir</button>
+      </div>
+    </section>
+
+    <section class="table-wrapper">
+      <table class="leaderboard" aria-label="Leaderboard">
+        <thead>
+          <tr>
+            <th data-key="rank">Rang</th>
+            <th data-key="team">Équipe</th>
+            <th data-key="accuracy">Score</th>
+            <th data-key="submitted_at">Temps</th>
+            <th data-key="progress">Progression</th>
+          </tr>
+        </thead>
+        <tbody id="leaderboard-body"></tbody>
+      </table>
+    </section>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+
 </html>

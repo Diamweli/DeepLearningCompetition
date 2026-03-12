@@ -23,8 +23,9 @@ const parseCsv = (text) => {
   }
   const [, ...data] = lines;
   return data
-    .map((line) => line.split(","))
-    .filter((parts) => parts.length >= 3)
+    .filter((line) => line.trim().length > 0)
+    .map((line) => line.split(",").map((f) => f.trim()))
+    .filter((parts) => parts.length >= 3 && parts[0].length > 0)
     .map(([team, accuracy, submittedAt]) => ({
       team,
       accuracy: Number.parseFloat(accuracy),
@@ -158,11 +159,26 @@ const renderTable = () => {
 };
 
 const updateData = async () => {
-  const response = await fetch(`${CSV_URL}?t=${Date.now()}`);
-  const text = await response.text();
-  state.rows = parseCsv(text);
-  lastUpdated.textContent = `Dernière mise à jour: ${new Date().toLocaleString("fr-FR")}`;
-  renderTable();
+  try {
+    const errorMsg = document.getElementById("error-message");
+    if (errorMsg) errorMsg.style.display = 'none';
+
+    const response = await fetch(`${CSV_URL}?t=${Date.now()}`);
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+    const text = await response.text();
+    state.rows = parseCsv(text);
+    lastUpdated.textContent = `Dernière mise à jour: ${new Date().toLocaleString("fr-FR")}`;
+    renderTable();
+  } catch (error) {
+    console.error("Erreur lors du chargement des données:", error);
+    const errorMsg = document.getElementById("error-message");
+    if (errorMsg) {
+      errorMsg.style.display = 'block';
+      errorMsg.textContent = `Impossible de charger le classement. Si vous ouvrez ce fichier directement depuis vos dossiers, le navigateur bloque l'accès au fichier CSV par sécurité (erreur CORS). Lancez un serveur local avec "python -m http.server 8000" dans ce dossier. Détails de l'erreur: ${error.message}`;
+    }
+  }
 };
 
 const handleSort = (event) => {
